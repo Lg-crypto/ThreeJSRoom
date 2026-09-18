@@ -104,6 +104,7 @@ export class Player {
     initMobileControls() {
         // Mostrar elementos mobile
         document.getElementById('joystick-container').classList.remove('hidden');
+        document.getElementById('mobile-flashlight-btn').classList.remove('hidden');
 
         const joystickBase = document.getElementById('joystick-base');
         const joystickHandle = document.getElementById('joystick-handle');

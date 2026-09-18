@@ -140,6 +140,7 @@ canvas {
     cursor: pointer;
     text-align: center;
     z-index: 15;
+    touch-action: manipulation;
 }
 
 #mobile-interact-btn {
@@ -150,6 +151,14 @@ canvas {
 #mobile-flashlight-btn {
     bottom: 130px;
     right: 40px;
+    transition: all 0.2s ease;
+}
+
+#mobile-flashlight-btn.active {
+    background-color: rgba(255, 204, 102, 0.7);
+    border-color: rgba(255, 222, 136, 1);
+    box-shadow: 0 0 20px rgba(255, 204, 102, 0.8);
+    color: #1b1200;
 }
 
 #joystick-container {

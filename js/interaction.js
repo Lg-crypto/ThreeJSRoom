@@ -28,6 +28,11 @@ export class InteractionSystem {
         // Estado da lanterna
         this.flashLightOn = false;
 
+        if (this.mobileFlashlightBtn) {
+            this.mobileFlashlightBtn.textContent = 'LANTERNA';
+            this.mobileFlashlightBtn.classList.remove('active');
+        }
+
         this.initListeners();
     }
 
@@ -53,6 +58,11 @@ export class InteractionSystem {
         // Lanterna via botão mobile
         if (this.mobileFlashlightBtn) {
             this.mobileFlashlightBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                this.toggleFlashlight();
+            });
+
+            this.mobileFlashlightBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 this.toggleFlashlight();
             });
@@ -149,6 +159,12 @@ export class InteractionSystem {
 
         this.flashLightOn = !this.flashLightOn;
         this.lights.flashlight.intensity = this.flashLightOn ? 1.0 : 0;
+
+        if (this.mobileFlashlightBtn) {
+            this.mobileFlashlightBtn.textContent = this.flashLightOn ? 'LANTERNA ON' : 'LANTERNA';
+            this.mobileFlashlightBtn.classList.toggle('active', this.flashLightOn);
+        }
+
         console.log(`Lanterna: ${this.flashLightOn ? 'Ligada' : 'Desligada'}`);
     }
 }
