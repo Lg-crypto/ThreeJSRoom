@@ -1,0 +1,74 @@
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #000;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #ddd;
+}
+
+canvas {
+    display: block;
+}
+
+#ui-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#crosshair {
+    font-size: 24px;
+    font-weight: 100;
+    color: rgba(255, 255, 255, 0.5);
+    user-select: none;
+}
+
+#interaction-prompt {
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 18px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    transition: opacity 0.2s ease;
+}
+
+#instructions {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.6);
+    pointer-events: all;
+    cursor: pointer;
+}
+
+#click-to-start {
+    font-size: 32px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+#controls-guide {
+    font-size: 16px;
+    text-align: center;
+    line-height: 1.6;
+    opacity: 0.8;
+}
+
+.hidden {
+    display: none !important;
+    opacity: 0;
+}

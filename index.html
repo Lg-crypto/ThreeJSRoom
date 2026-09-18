@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quarto Abandonado - Estudo Three.js</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Interface de Usuário (HUD) -->
+    <div id="ui-container">
+        <div id="crosshair">+</div>
+        <div id="interaction-prompt" class="hidden">Pressione E para interagir</div>
+        <div id="instructions">
+            <div id="click-to-start">Clique para explorar</div>
+            <div id="controls-guide" class="hidden">
+                WASD para movimentar<br>
+                Mouse para olhar<br>
+                E para interagir
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Map para Three.js via CDN -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
