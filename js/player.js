@@ -17,7 +17,8 @@ export class Player {
             w: false,
             a: false,
             s: false,
-            d: false
+            d: false,
+            f: false
         };
 
         this.yaw = 0;   // Rotação horizontal (esquerda/direita)

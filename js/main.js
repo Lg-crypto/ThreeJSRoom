@@ -32,8 +32,8 @@ class Game {
     }
 
     init() {
-        // 1. Criar Iluminação
-        this.lights = createLighting(this.scene);
+        // 1. Criar Iluminação (Agora passa a câmera para a lanterna)
+        this.lights = createLighting(this.scene, this.camera);
 
         // 2. Criar o Quarto
         this.room = createRoom(this.scene);
@@ -42,8 +42,8 @@ class Game {
         this.player = new Player(this.camera);
         this.scene.add(this.player.camera);
 
-        // 4. Sistema de Interação
-        this.interaction = new InteractionSystem(this.camera, this.scene);
+        // 4. Sistema de Interação (Agora passa as luzes para permitir controle da lanterna)
+        this.interaction = new InteractionSystem(this.camera, this.scene, this.lights);
 
         // Eventos
         window.addEventListener('resize', () => this.onWindowResize());
