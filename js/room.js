@@ -63,7 +63,7 @@ export function createRoom(scene) {
     wallFront.add(wallFrontRight);
 
     // Parte superior da porta
-    const wallFrontTop = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 0.2), wallMaterial);
+    const wallFrontTop = new THREE.Mesh(new THREE.BoxGeometry(2, 1, 0.2), wallMaterial);
     wallFrontTop.position.set(0, 3.5, 3);
     wallFront.add(wallFrontTop);
 
