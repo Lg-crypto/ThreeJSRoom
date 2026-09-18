@@ -11,12 +11,31 @@
     <div id="ui-container">
         <div id="crosshair">+</div>
         <div id="interaction-prompt" class="hidden">Pressione E para interagir</div>
+
+        <!-- Botão de Interação Mobile -->
+        <div id="mobile-interact-btn" class="hidden">INTERAGIR</div>
+
         <div id="instructions">
             <div id="click-to-start">Clique para explorar</div>
             <div id="controls-guide" class="hidden">
                 WASD para movimentar<br>
                 Mouse para olhar<br>
                 E para interagir
+            </div>
+        </div>
+
+        <!-- Aviso de Orientação (Mobile) -->
+        <div id="orientation-warning" class="hidden">
+            <div class="warning-content">
+                <span>🔄</span>
+                <p>Por favor, gire a tela para a posição horizontal (Paisagem)</p>
+            </div>
+        </div>
+
+        <!-- Joystick Virtual (Mobile) -->
+        <div id="joystick-container" class="hidden">
+            <div id="joystick-base">
+                <div id="joystick-handle"></div>
             </div>
         </div>
     </div>

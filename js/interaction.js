@@ -3,7 +3,7 @@ import * as THREE from 'three';
 /**
  * Classe InteractionSystem
  * Responsável por detectar objetos interativos usando Raycaster
- * e processar a entrada do teclado para disparar ações.
+ * e processar a entrada do teclado ou botões mobile para disparar ações.
  */
 export class InteractionSystem {
     constructor(camera, scene) {
@@ -15,6 +15,7 @@ export class InteractionSystem {
         this.raycaster.far = 3; // Distância máxima de interação
 
         this.promptElement = document.getElementById('interaction-prompt');
+        this.mobileBtnElement = document.getElementById('mobile-interact-btn');
         this.interactiveObject = null;
 
         // Estados para animação da porta
@@ -26,11 +27,20 @@ export class InteractionSystem {
     }
 
     initListeners() {
+        // Interação via teclado
         window.addEventListener('keydown', (e) => {
             if (e.key.toLowerCase() === 'e') {
                 this.interact();
             }
         });
+
+        // Interação via botão mobile
+        if (this.mobileBtnElement) {
+            this.mobileBtnElement.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                this.interact();
+            });
+        }
     }
 
     update() {
@@ -70,12 +80,14 @@ export class InteractionSystem {
             if (found) {
                 this.interactiveObject = found;
                 this.promptElement.classList.remove('hidden');
+                if (this.mobileBtnElement) this.mobileBtnElement.classList.remove('hidden');
                 return;
             }
         }
 
         this.interactiveObject = null;
         this.promptElement.classList.add('hidden');
+        if (this.mobileBtnElement) this.mobileBtnElement.classList.add('hidden');
     }
 
     interact() {

@@ -2,7 +2,8 @@ import * as THREE from 'three';
 
 /**
  * Classe Player
- * Gerencia a câmera em primeira pessoa, movimentação WASD e rotação via mouse.
+ * Gerencia a câmera em primeira pessoa, movimentação (WASD e Joystick)
+ * e rotação (Mouse e Touch).
  */
 export class Player {
     constructor(camera) {
@@ -22,10 +23,17 @@ export class Player {
         this.yaw = 0;   // Rotação horizontal (esquerda/direita)
         this.pitch = 0; // Rotação vertical (cima/baixo)
 
+        // Estado do Joystick Virtual
+        this.joystickValue = { x: 0, y: 0 };
+        this.isMobile = false;
+
         this.initListeners();
     }
 
     initListeners() {
+        // Detectar se é mobile (toque)
+        this.isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
         // Captura de teclado
         window.addEventListener('keydown', (e) => {
             const key = e.key.toLowerCase();
@@ -42,8 +50,6 @@ export class Player {
             if (document.pointerLockElement === document.body) {
                 this.yaw -= e.movementX * this.rotationSpeed;
                 this.pitch -= e.movementY * this.rotationSpeed;
-
-                // Limita a rotação vertical para não girar 360 graus (clamping)
                 this.pitch = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, this.pitch));
             }
         });
@@ -54,7 +60,12 @@ export class Player {
         const guide = document.getElementById('controls-guide');
 
         startUI.addEventListener('click', () => {
-            document.body.requestPointerLock();
+            if (!this.isMobile) {
+                document.body.requestPointerLock();
+            } else {
+                // No mobile, apenas escondemos o menu inicial
+                startUI.classList.add('hidden');
+            }
         });
 
         document.addEventListener('pointerlockchange', () => {
@@ -67,42 +78,145 @@ export class Player {
                 guide.classList.remove('hidden');
             }
         });
+
+        if (this.isMobile) {
+            this.initMobileControls();
+            this.initOrientationWarning();
+        }
+    }
+
+    initOrientationWarning() {
+        const warning = document.getElementById('orientation-warning');
+
+        const checkOrientation = () => {
+            if (window.innerHeight > window.innerWidth) {
+                warning.classList.remove('hidden');
+            } else {
+                warning.classList.add('hidden');
+            }
+        };
+
+        window.addEventListener('resize', checkOrientation);
+        checkOrientation();
+    }
+
+    initMobileControls() {
+        // Mostrar elementos mobile
+        document.getElementById('joystick-container').classList.remove('hidden');
+
+        const joystickBase = document.getElementById('joystick-base');
+        const joystickHandle = document.getElementById('joystick-handle');
+        const baseRect = joystickBase.getBoundingClientRect();
+        const centerX = baseRect.width / 2;
+        const centerY = baseRect.height / 2;
+        const maxDistance = baseRect.width / 2;
+
+        // 1. Controle do Joystick Virtual
+        const onJoystickStart = (e) => {
+            e.preventDefault();
+            this.handleJoystickTouch(e, joystickHandle, centerX, centerY, maxDistance);
+        };
+
+        const onJoystickMove = (e) => {
+            e.preventDefault();
+            this.handleJoystickTouch(e, joystickHandle, centerX, centerY, maxDistance);
+        };
+
+        const onJoystickEnd = () => {
+            this.joystickValue = { x: 0, y: 0 };
+            joystickHandle.style.left = '50%';
+            joystickHandle.style.top = '50%';
+            joystickHandle.style.transform = 'translate(-50%, -50%)';
+        };
+
+        joystickBase.addEventListener('touchstart', onJoystickStart);
+        joystickBase.addEventListener('touchmove', onJoystickMove);
+        joystickBase.addEventListener('touchend', onJoystickEnd);
+
+        // 2. Controle de Olhar (Touch Drag na tela)
+        let lastTouchX = 0;
+        let lastTouchY = 0;
+
+        window.addEventListener('touchstart', (e) => {
+            // Só processa toque para olhar se não for no joystick
+            if (e.target.id === 'joystick-base' || e.target.id === 'joystick-handle') return;
+
+            const touch = e.touches[0];
+            lastTouchX = touch.clientX;
+            lastTouchY = touch.clientY;
+        }, { passive: false });
+
+        window.addEventListener('touchmove', (e) => {
+            if (e.target.id === 'joystick-base' || e.target.id === 'joystick-handle') return;
+
+            const touch = e.touches[0];
+            const deltaX = touch.clientX - lastTouchX;
+            const deltaY = touch.clientY - lastTouchY;
+
+            this.yaw -= deltaX * this.rotationSpeed * 2;
+            this.pitch -= deltaY * this.rotationSpeed * 2;
+            this.pitch = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, this.pitch));
+
+            lastTouchX = touch.clientX;
+            lastTouchY = touch.clientY;
+        }, { passive: false });
+    }
+
+    handleJoystickTouch(e, handle, centerX, centerY, maxDistance) {
+        const touch = e.touches[0];
+        const rect = e.currentTarget.getBoundingClientRect();
+
+        let touchX = touch.clientX - rect.left - centerX;
+        let touchY = touch.clientY - rect.top - centerY;
+
+        const distance = Math.sqrt(touchX * touchX + touchY * touchY);
+
+        if (distance > maxDistance) {
+            touchX *= maxDistance / distance;
+            touchY *= maxDistance / distance;
+        }
+
+        // Atualiza a posição visual do handle
+        handle.style.left = `${centerX + touchX}px`;
+        handle.style.top = `${centerY + touchY}px`;
+        handle.style.transform = 'translate(-50%, -50%)';
+
+        // Normaliza os valores para movimentação (-1 a 1)
+        this.joystickValue.x = touchX / maxDistance;
+        this.joystickValue.y = touchY / maxDistance;
     }
 
     update(deltaTime) {
-        // 1. Aplicar rotações à câmera
-        this.camera.rotation.set(0, 0, 0); // Reset
+        this.camera.rotation.set(0, 0, 0);
         this.camera.rotateY(this.yaw);
         this.camera.rotateX(this.pitch);
 
-        // 2. Movimentação
         const movement = new THREE.Vector3(0, 0, 0);
-
-        // Direções relativas à câmera
         const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(this.camera.quaternion);
         const right = new THREE.Vector3(1, 0, 0).applyQuaternion(this.camera.quaternion);
 
-        // Zerar Y para não "voar" ao olhar para cima/baixo
         forward.y = 0;
         forward.normalize();
         right.y = 0;
         right.normalize();
 
+        // Input Teclado
         if (this.keys.w) movement.add(forward);
         if (this.keys.s) movement.sub(forward);
         if (this.keys.a) movement.sub(right);
         if (this.keys.d) movement.add(right);
 
+        // Input Joystick (Soma ao movimento)
+        if (this.isMobile) {
+            movement.add(forward.clone().multiplyScalar(-this.joystickValue.y));
+            movement.add(right.clone().multiplyScalar(this.joystickValue.x));
+        }
+
         if (movement.length() > 0) {
             movement.normalize().multiplyScalar(this.moveSpeed * deltaTime);
 
-            // Guardar posição anterior para colisão
-            const oldPos = this.camera.position.clone();
-
             this.camera.position.add(movement);
 
-            // Colisão Simples (Limites do Quarto 6x6)
-            // Margem de 0.2 para evitar atravessar a parede
             const margin = 0.2;
             if (this.camera.position.x > 3 - margin) this.camera.position.x = 3 - margin;
             if (this.camera.position.x < -3 + margin) this.camera.position.x = -3 + margin;
